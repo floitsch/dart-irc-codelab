@@ -2,7 +2,7 @@ Talk-to-me
 ==========
 
 In this code lab, you build an IRC bot that produces random sentences based on
-knowledge it learned from "reading" existing texts.
+knowledge it learned from "reading" existing documents.
 
 Step 0
 ------
@@ -13,8 +13,8 @@ Since we build an IRC bot, you will need an IRC client. Also,
 a local IRC server is great for debugging. While not
 strictly necessary it makes debugging much easier. There are lots of options,
 but a Google search seems to recommend ngircd. It's most likely total overkill
-for this code lab, but works fine. Make sure to compile it with debugging
-support:
+for this code lab, but works fine. Make sure to compile and run it with
+debugging support:
 
 ```bash
 ./configure --prefix=$PWD/out --enable-sniffer --enable-debug
@@ -25,8 +25,9 @@ out/sbin/ngircd -n -s
 If you have a smaller option that doesn't require any compilation feel free to
 reach out to me so I can update this step.
 
-Optionally clone XYZ to get the complete sources of this code lab. If you are
-stuck at any moment you can switch to the official sources.
+Optionally clone `https://github.com/floitsch/dart-irc-codelab.git` to get the
+complete sources of this code lab. The git repository has different branches
+for every step.
 
 Step 1 - Hello world
 ------
@@ -44,10 +45,11 @@ main() {
 }
 ```
 
-Congratulations: you just wrote a Dart application. Run it either through your
-IDE or with `dart --checked main.dart`. The `--checked` flag is not necessary
-but strongly recommended when developing. It dynamically checks the types in
-the program. Currently your program doesn't have any yet, so let's change that:
+Congratulations: you just wrote a complete Dart application. Run it either
+through your IDE or with `dart --checked main.dart`. The `--checked` flag is not
+necessary but strongly recommended when developing. It dynamically checks the
+types in the program. Currently your program doesn't have any yet, so let's
+change that:
 
 ```dart
 void main() {
@@ -63,13 +65,13 @@ boundaries (but you can write them more frequently or not at all).
 Step 2 - Connect to the server
 ------
 
-In this step, we connect to an IRC server. Our client will be really dump and
+In this step, we connect to an IRC server. Our client will be really dumb and
 only support a tiny subset of IRC commands. The complete spec is in
 [RFC 2812](https://tools.ietf.org/html/rfc2812); a summary can be found
 [here](http://blog.initprogram.com/2010/10/14/a-quick-basic-primer-on-the-irc-protocol/).
 
 Let's start with connecting a socket to the server. If possible connect to a
-local server first before you connect to a public external server.
+local server first, before you connect to a public external server.
 
 [Sockets](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:io.Socket)
 are part of the IO-library. As such, we have to import them first. Add the
@@ -86,7 +88,7 @@ means that this call won't block, but yields immediately. Instead, it returns a
 [Future](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:async.Future)
 of the result. Futures (aka "promise" or "eventual") are objects that represent
 values that haven't been computed yet. Once the value is available, the future
-invokes callbacks that have been waiting for the value. Let's try this out:
+invokes callbacks that have been waiting for the value. Let's give it a try:
 
 ```dart
 void main() {
@@ -113,7 +115,12 @@ netcat (`nc -l 6667`), otherwise you will see the following error message:
     Unhandled exception:
     Uncaught Error: SocketException: OS Error: Connection refused, errno = 111, address = localhost, port = 52933
 
-Now that we are connected, let's say authenticate and say hello:
+This is a good opportunity to point out that throughout this code lab we will
+ignore errors. A real-world program would need to be much more careful where
+and when it needs to catch uncaught exceptions.
+
+Assuming that everything went well we should be connected now. Let's
+authenticate and say "hello":
 
 ```dart
 /// Given a connected [socket] runs the IRC bot.
@@ -408,7 +415,7 @@ void addBook(String fileName) {
       // doesn't have a corresponding set yet, create it. Then add the
       // third word into the set.
       _db.putIfAbsent("$preprevious $previous", () => new Set())
-         .add(current);
+          .add(current);
     }
 
     preprevious = previous;
