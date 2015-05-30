@@ -4,13 +4,22 @@
 
 import 'dart:io';
 
+void handleIrcSocket(Socket socket) {
+
+  void authenticate() {
+    var nick = "myBot";  // <=== Replace with your bot name. Try to be unique.
+    socket.write('NICK $nick\r\n');
+    socket.write('USER username 8 * :$nick\r\n');
+  }
+
+  authenticate();
+  socket.write('JOIN ##dart-irc-codelab\r\n');
+  socket.write('PRIVMSG ##dart-irc-codelab :Hello world\r\n');
+  socket.write('QUIT\r\n');
+  socket.destroy();
+}
+
 void main() {
-  var future = Socket.connect("localhost", 6667);
-  // Now register a callback:
-  future.then((socket) {
-    // The socket is now available.
-    print("Connected");
-    socket.destroy();
-  });
-  print("Callback has been registered, but we are not connected yet");
+  Socket.connect("localhost", 6667)  // No need for the temporary variable.
+      .then(handleIrcSocket);
 }
