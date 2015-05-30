@@ -9,7 +9,7 @@ import 'dart:math';
 final RegExp ircMessageRegExp =
     new RegExp(r":([^!]+)!([^ ]+) PRIVMSG ([^ ]+) :(.*)");
 
-void handleIrcSocket(Socket socket) {
+void handleIrcSocket(Socket socket, SentenceGenerator sentenceGenerator) {
   final nick = "myBot";  // <=== Replace with your bot name. Try to be unique.
 
   /// Sends a message to the IRC server.
@@ -24,17 +24,29 @@ void handleIrcSocket(Socket socket) {
     writeln('USER username 8 * :$nick');
   }
 
+  void say(String message) {
+    if (message.length > 120) {
+      // IRC doesn't like it when lines are too long.
+      message = message.substring(0, 120);
+    }
+    writeln('PRIVMSG ##dart-irc-codelab :$message');
+  }
+
   void handleMessage(String msgNick,
                      String server,
                      String channel,
                      String msg) {
     if (msg.startsWith("$nick:")) {
       // Direct message to us.
-      var text = msg.substring(msg.indexOf(":") + 1);
-      if (text.trim() == "please leave") {
-        print("Leaving by request of $msgNick");
-        writeln("QUIT");
-        return;
+      var text = msg.substring(msg.indexOf(":") + 1).trim();
+      switch (text) {
+        case "please leave":
+          print("Leaving by request of $msgNick");
+          writeln("QUIT");
+          return;
+        case "talk to me":
+          say(sentenceGenerator.generateRandomSentence());
+          return;
       }
     }
     print("$msgNick: $msg");
@@ -61,12 +73,12 @@ void handleIrcSocket(Socket socket) {
 
   authenticate();
   writeln('JOIN ##dart-irc-codelab');
-  writeln('PRIVMSG ##dart-irc-codelab :Hello world');
+  say("Hello world");
 }
 
-void runIrcBot() {
+void runIrcBot(SentenceGenerator generator) {
   Socket.connect("localhost", 6667)
-      .then(handleIrcSocket);
+      .then((socket) => handleIrcSocket(socket, generator));
 }
 
 class SentenceGenerator {
@@ -133,5 +145,5 @@ class SentenceGenerator {
 void main(arguments) {
   var generator = new SentenceGenerator();
   arguments.forEach(generator.addBook);
-  print(generator.generateRandomSentence());
+  runIrcBot(generator);
 }
