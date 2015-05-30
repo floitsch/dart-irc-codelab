@@ -9,6 +9,8 @@ final RegExp ircMessageRegExp =
     new RegExp(r":([^!]+)!([^ ]+) PRIVMSG ([^ ]+) :(.*)");
 
 void handleIrcSocket(Socket socket) {
+  final nick = "myBot";  // <=== Replace with your bot name. Try to be unique.
+
   /// Sends a message to the IRC server.
   ///
   /// The message is automatically terminated with a `\r\n`.
@@ -17,7 +19,6 @@ void handleIrcSocket(Socket socket) {
   }
 
   void authenticate() {
-    var nick = "myBot";  // <=== Replace with your bot name. Try to be unique.
     writeln('NICK $nick');
     writeln('USER username 8 * :$nick');
   }
@@ -26,6 +27,15 @@ void handleIrcSocket(Socket socket) {
                      String server,
                      String channel,
                      String msg) {
+    if (msg.startsWith("$nick:")) {
+      // Direct message to us.
+      var text = msg.substring(msg.indexOf(":") + 1);
+      if (text.trim() == "please leave") {
+        print("Leaving by request of $msgNick");
+        writeln("QUIT");
+        return;
+      }
+    }
     print("$msgNick: $msg");
   }
 
