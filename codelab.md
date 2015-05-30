@@ -351,10 +351,10 @@ void main(List<String> arguments) {
 
 We want to analyze existing documents to farm them for trigrams.
 [Gutenberg](http://gutenberg.org) is a good resource for out-of-copyright work
-that is perfect for this task. I will use
+that is perfect for this task. I used
 [Alice in Wonderland](http://www.gutenberg.org/cache/epub/11/pg11.txt), and
 [The US constitution](http://www.gutenberg.org/cache/epub/5/pg5.txt) in this
-code lab.
+code lab, but there are many other interesting documents.
 
 Download these (or other books) and change your setup so that your program is
 invoked with these books as arguments. You should have an output similar to
@@ -382,9 +382,9 @@ void main(arguments) {
 }
 ```
 
-Note the "_" in `_db` field name. It means that this field is only visible
+Note the "\_" in `_db` field name. It means that this field is only visible
 within the same library. The same mechanism also works for classes, methods or
-static functions. The moment an identifier starts with an "_" it is private to
+static functions. The moment an identifier starts with an "\_" it is private to
 the current library.
 
 Since our code lab is small and privacy protection is completely unnecessary we
@@ -635,7 +635,7 @@ void handleMessage(...) {
 This will currently crash dynamically, because we haven't implemented the
 `finishSentence` method yet. Note, that the VM still runs the code, and only
 fails dynamically when it encounters the line that contains the method call.
-However, the editor (or `dartanalyzer`) warn you statically that there is a
+However, the editor (or `dartanalyzer`) warns you statically that there is a
 likely problem at this location.
 
 In order to implement the missing `finishSentence` function we first split the
@@ -751,6 +751,10 @@ Iterable<String> generateSentences({String startingWith}) sync* {
 }
 ```
 
+Note: this implementation is inefficient, since it calls `finishSentence`
+with the same prefix over and over again. A more efficient solution would do the
+prefix computation once, end then call `generateSentenceStartingWith` directly.
+
 This function has a named argument `startingWith`. This allows us to
 call the function either with or without the desired prefix. Just after the
 named argument we have a crucial token: the `sync*` modifier of the function.
@@ -761,12 +765,8 @@ VM creates a state machine that keeps track of where it is. Whenever the
 returned Iterable requests a new item, the VM advances in the state machine
 until it encounters another `yield`.
 
-Note: this implementation is inefficient, since it calls `finishSentence`
-with the same prefix over and over again. A more efficient solution would do the
-prefix computation once, end then call `generateSentenceStartingWith` directly.
-
-To illustrate how this can be used, let's modify the `finish` command to filter
-sentences that are longer than 120 characters.
+To illustrate how the resulting Iterable can be used, let's modify the `finish`
+command to filter sentences that are longer than 120 characters.
 
 ```dart
 default:
