@@ -3,23 +3,43 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:io';
+import 'dart:convert';
 
 void handleIrcSocket(Socket socket) {
 
-  void authenticate() {
-    var nick = "myBot";  // <=== Replace with your bot name. Try to be unique.
-    socket.write('NICK $nick\r\n');
-    socket.write('USER username 8 * :$nick\r\n');
+  /// Sends a message to the IRC server.
+  ///
+  /// The message is automatically terminated with a `\r\n`.
+  void writeln(String message) {
+    socket.write('$message\r\n');
   }
 
+  void authenticate() {
+    var nick = "myBot";  // <=== Replace with your bot name. Try to be unique.
+    writeln('NICK $nick');
+    writeln('USER username 8 * :$nick');
+  }
+
+  void handleServerLine(String line) {
+    print("from server: $line");
+    if (line.startsWith("PING")) {
+      writeln("PONG ${line.substring("PING ".length)}");
+    }
+  }
+
+  socket
+      .transform(UTF8.decoder)
+      .transform(new LineSplitter())
+      .listen(handleServerLine,
+              onDone: socket.close);
+
   authenticate();
-  socket.write('JOIN ##dart-irc-codelab\r\n');
-  socket.write('PRIVMSG ##dart-irc-codelab :Hello world\r\n');
-  socket.write('QUIT\r\n');
-  socket.destroy();
+  writeln('JOIN ##dart-irc-codelab');
+  writeln('PRIVMSG ##dart-irc-codelab :Hello world');
+  writeln('QUIT');
 }
 
 void main() {
-  Socket.connect("localhost", 6667)  // No need for the temporary variable.
+  Socket.connect("localhost", 6667)
       .then(handleIrcSocket);
 }
