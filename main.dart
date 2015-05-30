@@ -29,8 +29,8 @@ void handleIrcSocket(Socket socket) {
                      String msg) {
     if (msg.startsWith("$nick:")) {
       // Direct message to us.
-      var text = msg.substring(msg.indexOf(":") + 1);
-      if (text.trim() == "please leave") {
+      var text = msg.substring(msg.indexOf(":") + 1).trim();
+      if (text == "please leave") {
         print("Leaving by request of $msgNick");
         writeln("QUIT");
         return;
