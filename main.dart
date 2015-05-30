@@ -63,7 +63,20 @@ void handleIrcSocket(Socket socket) {
   writeln('PRIVMSG ##dart-irc-codelab :Hello world');
 }
 
-void main() {
+void runIrcBot() {
   Socket.connect("localhost", 6667)
       .then(handleIrcSocket);
+}
+
+class SentenceGenerator {
+  final _db = new Map<String, Set<String>>();
+
+  void addBook(String fileName) {
+    print("TODO: add book $fileName");
+  }
+}
+
+void main(arguments) {
+  var generator = new SentenceGenerator();
+  arguments.forEach(generator.addBook);
 }
