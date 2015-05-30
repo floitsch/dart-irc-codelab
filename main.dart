@@ -5,8 +5,10 @@
 import 'dart:io';
 import 'dart:convert';
 
-void handleIrcSocket(Socket socket) {
+final RegExp ircMessageRegExp =
+    new RegExp(r":([^!]+)!([^ ]+) PRIVMSG ([^ ]+) :(.*)");
 
+void handleIrcSocket(Socket socket) {
   /// Sends a message to the IRC server.
   ///
   /// The message is automatically terminated with a `\r\n`.
@@ -20,11 +22,24 @@ void handleIrcSocket(Socket socket) {
     writeln('USER username 8 * :$nick');
   }
 
+  void handleMessage(String msgNick,
+                     String server,
+                     String channel,
+                     String msg) {
+    print("$msgNick: $msg");
+  }
+
   void handleServerLine(String line) {
-    print("from server: $line");
     if (line.startsWith("PING")) {
       writeln("PONG ${line.substring("PING ".length)}");
+      return;
     }
+    var match = ircMessageRegExp.firstMatch(line);
+    if (match != null) {
+      handleMessage(match[1], match[2], match[3], match[4]);
+      return;
+    }
+    print("from server: $line");
   }
 
   socket
@@ -36,7 +51,6 @@ void handleIrcSocket(Socket socket) {
   authenticate();
   writeln('JOIN ##dart-irc-codelab');
   writeln('PRIVMSG ##dart-irc-codelab :Hello world');
-  writeln('QUIT');
 }
 
 void main() {
