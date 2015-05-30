@@ -4,6 +4,7 @@
 
 import 'dart:io';
 import 'dart:convert';
+import 'dart:math';
 
 final RegExp ircMessageRegExp =
     new RegExp(r":([^!]+)!([^ ]+) PRIVMSG ([^ ]+) :(.*)");
@@ -70,6 +71,7 @@ void runIrcBot() {
 
 class SentenceGenerator {
   final _db = new Map<String, Set<String>>();
+  final rng = new Random();
 
   void addBook(String fileName) {
     var content = new File(fileName).readAsStringSync();
@@ -100,9 +102,36 @@ class SentenceGenerator {
       previous = current;
     }
   }
+
+  int get keyCount => _db.length;
+
+  String pickRandomPair() => _db.keys.elementAt(rng.nextInt(keyCount));
+
+  String pickRandomThirdWord(String firstWord, String secondWord) {
+    var key = "$firstWord $secondWord";
+    var possibleSequences = _db[key];
+    return possibleSequences.elementAt(rng.nextInt(possibleSequences.length));
+  }
+
+  String generateRandomSentence() {
+    var start = pickRandomPair();
+    var startingWords = start.split(" ");
+    var preprevious = startingWords[0];
+    var previous = startingWords[1];
+    var sentence = [preprevious, previous];
+    var current;
+    do {
+      current = pickRandomThirdWord(preprevious, previous);
+      sentence.add(current);
+      preprevious = previous;
+      previous = current;
+    } while (current != ".");
+    return sentence.join(" ");
+  }
 }
 
 void main(arguments) {
   var generator = new SentenceGenerator();
   arguments.forEach(generator.addBook);
+  print(generator.generateRandomSentence());
 }
