@@ -50,7 +50,12 @@ void handleIrcSocket(Socket socket, SentenceGenerator sentenceGenerator) {
         default:
           if (text.startsWith("finish: ")) {
             var start = text.substring("finish: ".length);
-            var sentence = sentenceGenerator.finishSentence(start);
+            var sentence = sentenceGenerator
+                .generateSentences(startingWith: start)
+                .take(10000)  // Make sure we don't run forever.
+                .where((sentence) => sentence != null)
+                .firstWhere((sentence) => sentence.length < 120,
+                            orElse: () => null);
             say(sentence == null ? "Unable to comply." : sentence);
             return;
           }
@@ -185,6 +190,22 @@ class SentenceGenerator {
       previous = current;
     } while (current != ".");
     return sentence.join(" ");
+  }
+
+  /// Returns an Iterable of sentences.
+  ///
+  /// If the optional named argument [startingWith] is not provided or `null`,
+  /// the Iterable contains random sentences. Otherwise it contains sentences
+  /// starting with the given prefix (as if produced by [finishSentence]).
+  Iterable<String> generateSentences({String startingWith}) sync* {
+    while (true) {
+      if (startingWith == null) {
+        // No optional argument given, or it was null.
+        yield generateRandomSentence();
+      } else {
+        yield finishSentence(startingWith);
+      }
+    }
   }
 }
 
