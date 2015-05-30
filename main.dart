@@ -47,6 +47,13 @@ void handleIrcSocket(Socket socket, SentenceGenerator sentenceGenerator) {
         case "talk to me":
           say(sentenceGenerator.generateRandomSentence());
           return;
+        default:
+          if (text.startsWith("finish: ")) {
+            var start = text.substring("finish: ".length);
+            var sentence = sentenceGenerator.finishSentence(start);
+            say(sentence == null ? "Unable to comply." : sentence);
+            return;
+          }
       }
     }
     print("$msgNick: $msg");
@@ -125,11 +132,50 @@ class SentenceGenerator {
     return possibleSequences.elementAt(rng.nextInt(possibleSequences.length));
   }
 
+  /// Finishes a sentence with the given [start].
+  ///
+  /// If for the given [start] no completion can be found, the function drops
+  /// the last words and tries again until it either finds a completion or
+  /// too few words are left.
+  ///
+  /// Returns null, if no completion can be found.
+  String finishSentence(String start) {
+    // This function has local types, to show the differences between List and
+    // Iterable.
+
+    List words = start.split(" ");
+    // By reversing the list we don't need to deal with the length that much.
+    // It also allows to show a few more Iterable functions.
+    Iterable reversedRemaining = words.reversed;
+    while (reversedRemaining.length >= 2) {
+      String secondToLast = reversedRemaining.elementAt(1);
+      String last = reversedRemaining.first;
+      String leadPair = "$secondToLast $last";
+      if (_db.containsKey(leadPair)) {
+        // If the leadPair is in the database, it means that we have data to
+        // continue from these two words.
+        String beginning = reversedRemaining
+            .skip(2)    // 'last' and 'secondToLast' are already handled.
+            .toList()   // Iterable does not have `reversed`.
+            .reversed   // These are the remaining words.
+            .join(" "); // Join them to have the beginning of the sentence.
+        String end = generateSentenceStartingWith(secondToLast, last);
+        return "$beginning $end";
+      }
+      // We weren't able to continue from the last two words. Drop one, and try
+      // again.
+      reversedRemaining = reversedRemaining.skip(1);
+    }
+    return null;
+  }
+
   String generateRandomSentence() {
     var start = pickRandomPair();
     var startingWords = start.split(" ");
-    var preprevious = startingWords[0];
-    var previous = startingWords[1];
+    return generateSentenceStartingWith(startingWords[0], startingWords[1]);
+  }
+
+  String generateSentenceStartingWith(String preprevious, String previous) {
     var sentence = [preprevious, previous];
     var current;
     do {
