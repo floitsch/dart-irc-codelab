@@ -127,9 +127,9 @@ authenticate and say "hello":
 void handleIrcSocket(Socket socket) {
 
   void authenticate() {
-    var name = "myBot";  // <=== Replace with your bot name. Try to be unique. 
-    socket.write('NICK $name\r\n');
-    socket.write('USER username 8 * :$name\r\n');
+    var nick = "myBot";  // <=== Replace with your bot name. Try to be unique.
+    socket.write('NICK $nick\r\n');
+    socket.write('USER username 8 * :$nick\r\n');
   }
         
   authenticate();
@@ -156,13 +156,13 @@ Lot's of things are happening here:
 
 * Inside `authenticate` we send the IRC `NICK` and `USER` commands. For this, we
   need a nick and a username. For simplicity we use the same name here. The
-  variable `name` holds that string, and is spliced into the command strings
+  variable `nick` holds that string, and is spliced into the command strings
   using string interpolation. String interpolation is just a simple nice way of
   concatenating strings.
 
 * Once we are authenticated, we join the `##dart-irc-codelab` channel and
   send a message to it. Note that, in theory, joining the channel is not
-  always necessary. However, many servers (including freenode) disably messages
+  always necessary. However, many servers (including freenode) disable messages
   from the outside by default.
 
 * So far, we don't listen to anything from the server. This is clearly not a
@@ -288,8 +288,8 @@ void handleMessage(String msgNick,
                    String msg) {
   if (msg.startsWith("$nick:")) {
     // Direct message to us.
-    var text = msg.substring(msg.indexOf(":") + 1);
-    if (text.trim() == "please leave") {
+    var text = msg.substring(msg.indexOf(":") + 1).trim();
+    if (text == "please leave") {
       print("Leaving by request of $msgNick");
       writeln("QUIT");
       return;
