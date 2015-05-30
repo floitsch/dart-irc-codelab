@@ -72,7 +72,33 @@ class SentenceGenerator {
   final _db = new Map<String, Set<String>>();
 
   void addBook(String fileName) {
-    print("TODO: add book $fileName");
+    var content = new File(fileName).readAsStringSync();
+
+    // Make sure the content terminates with a ".".
+    if (!content.endsWith(".")) content += ".";
+
+    var words = content
+        .replaceAll("\n", " ") // Treat new lines as if they were spaces.
+        .replaceAll("\r", "")  // Discard "\r".
+        .replaceAll(".", " .") // Add space before "." to simplify splitting.
+        .split(" ")
+        .where((String word) => word != "");
+
+    var preprevious = null;
+    var previous = null;
+    for (String current in words) {
+      if (preprevious != null) {
+        // We have a trigram.
+        // Concatenate the first two words and use it as a key. If this key
+        // doesn't have a corresponding set yet, create it. Then add the
+        // third word into the set.
+        _db.putIfAbsent("$preprevious $previous", () => new Set())
+            .add(current);
+      }
+
+      preprevious = previous;
+      previous = current;
+    }
   }
 }
 
