@@ -643,14 +643,14 @@ In order to implement the missing `finishSentence` function we first split the
 
 ```dart
 String generateRandomSentence() {
-  String start = pickRandomPair();
-  List<String> startingWords = start.split(" ");
+  var start = pickRandomPair();
+  var startingWords = start.split(" ");
   return generateSentenceStartingWith(startingWords[0], startingWords[1]);
 }
 
 String generateSentenceStartingWith(String preprevious, String previous) {
-  List<String> sentence = [preprevious, previous];
-  String current;
+  var sentence = [preprevious, previous];
+  var current;
   ...
 }
 ```
