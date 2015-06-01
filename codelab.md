@@ -109,7 +109,7 @@ their return type (but can have type arguments for their arguments). They
 cannot be named, either.
 
 Before running this program, make sure that you have some server running on
-localhost 6667. You can, for example, start a local IRC server, or running
+localhost 6667. You can, for example, start a local IRC server, or run
 netcat (`nc -l 6667`), otherwise you will see the following error message:
 
     Unhandled exception:
