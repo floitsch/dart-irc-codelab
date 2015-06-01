@@ -115,7 +115,7 @@ netcat (`nc -l 6667`), otherwise you will see the following error message:
     Unhandled exception:
     Uncaught Error: SocketException: OS Error: Connection refused, errno = 111, address = localhost, port = 52933
 
-This is a good opportunity to point out that throughout this code lab we will
+This is a good opportunity to point out that, throughout this code lab, we will
 ignore errors. A real-world program would need to be much more careful where
 and when it needs to catch uncaught exceptions.
 
