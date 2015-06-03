@@ -35,7 +35,8 @@ Step 1 - Hello world
 In this step, we create an skeleton app of Dart. We will keep this project
 really simple, and only work with one file. This means that we don't need to go
 through any project wizard. Just open a new file `main.dart` (or any other
-name you prefer) and open it.
+name you prefer) and open it. (You can also create a console-application
+skeleton and clear the code in the main file).
 
 Add the following lines to it:
 
@@ -99,7 +100,7 @@ void main() {
     print("Connected");
     socket.destroy();  // Shuts down the socket in both directions.
   });
-  print("Callback has been registered, but we are not connected yet");
+  print("Callback has been registered, but hasn't been called yet");
 }
 ```
 
@@ -109,13 +110,13 @@ their return type (but can have type arguments for their arguments). They
 cannot be named, either.
 
 Before running this program, make sure that you have some server running on
-localhost 6667. You can, for example, start a local IRC server, or running
+localhost 6667. You can, for example, start a local IRC server, or run
 netcat (`nc -l 6667`), otherwise you will see the following error message:
 
     Unhandled exception:
     Uncaught Error: SocketException: OS Error: Connection refused, errno = 111, address = localhost, port = 52933
 
-This is a good opportunity to point out that throughout this code lab we will
+This is a good opportunity to point out that, throughout this code lab, we will
 ignore errors. A real-world program would need to be much more careful where
 and when it needs to catch uncaught exceptions.
 
@@ -313,7 +314,7 @@ message to the bot: `myBot: please leave`.
 
 At this point in the code lab we will switch to generating random sentences. We
 will come back to the irc-bot once we have something interesting to say. If you
-are interested you can however experiment with a few other commands. Some easy
+are interested you can of course experiment with a few other commands. Some easy
 ones are "echo <msg>", "what's the time?", or "how long till dinner?".
 
 Step 5 - Trigrams
@@ -643,14 +644,14 @@ In order to implement the missing `finishSentence` function we first split the
 
 ```dart
 String generateRandomSentence() {
-  String start = pickRandomPair();
-  List<String> startingWords = start.split(" ");
+  var start = pickRandomPair();
+  var startingWords = start.split(" ");
   return generateSentenceStartingWith(startingWords[0], startingWords[1]);
 }
 
 String generateSentenceStartingWith(String preprevious, String previous) {
-  List<String> sentence = [preprevious, previous];
-  String current;
+  var sentence = [preprevious, previous];
+  var current;
   ...
 }
 ```
@@ -705,7 +706,7 @@ features ways to filter the data (`where`, `skip`, `take`), to transform it
 It is important to note that Iterables are _lazy_ in that all methods that
 return themselves an Iterable don't do any work until something iterates over
 the returned Iterable. Even then, they only do the work on the items that are
-requested. One the one hand, this makes it possible to apply these methods on
+requested. On the one hand, this makes it possible to apply these methods on
 infinite Iterables, and to chain methods without fear of allocating intermediate
 storage. On the other hand, one can accidentally execute the same
 transforming or filtering function multiple times.
