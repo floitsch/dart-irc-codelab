@@ -229,7 +229,9 @@ Normal data (the lines) is sent to the
 is invoked when the server shut down the connection. At that moment we simply
 invoke the torn-off closure `socket.close`. The closure `socket.close` is bound
 to the socket it came from, and will correctly close the sending part of the
-socket.
+socket. Since we are sending a `QUIT` message after our `Hello world` message
+the server will furthermore close the receiving part of the connection. We can
+thus remove the `socket.destroy()` line we had in the previous step.
 
 If you feel (slightly) adventurous, you can try your bot in the wild now.
 Use your IRC client to connect to chat.freenode.net and join the
@@ -237,7 +239,9 @@ Use your IRC client to connect to chat.freenode.net and join the
 change the `localhost` line to `chat.freenode.net`. Then run your program again.
 You should see a hello-world message (hopefully from your bot) on the public
 channel. If not, you should see an indication of why the server rejected your
-requests.
+requests. If you don't see the message and don't get anything useful from the
+server, check that the program doesn't contain the `socket.destroy` line
+anymore.
 
 So far the bot only handles the `PING` line from the server. We are only
 interested in one other type of messages: `PRIVMSG`s from other clients. The
